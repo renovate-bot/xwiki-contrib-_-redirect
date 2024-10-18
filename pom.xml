@@ -30,7 +30,7 @@
   <artifactId>redirect-parent</artifactId>
   <packaging>pom</packaging>
   <name>Redirect macro - Parent POM</name>
-  <version>1.0.0-SNAPSHOT</version>
+  <version>1.0.0</version>
   <properties>
     <xwiki.release.jira.skip>false</xwiki.release.jira.skip>
     <!-- Don't run CLIRR here since there's no Java code. -->
@@ -47,7 +47,7 @@
     <connection>scm:git:git://github.com/xwiki-contrib/redirect.git</connection>
     <developerConnection>scm:git:git@github.com:xwiki-contrib/redirect.git</developerConnection>
     <url>https://github.com/xwiki-contrib/redirect</url>
-    <tag>HEAD</tag>
+    <tag>redirect-parent-1.0.0</tag>
   </scm>
   <build>
     <extensions>
