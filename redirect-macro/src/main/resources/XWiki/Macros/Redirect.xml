@@ -49,19 +49,19 @@ Parameters:
 == With document reference ==
 
 {{code}}
-{{redirect location="Sandbox.TestPage1" delay="3" visible="false"/}}
+{{redirect reference="Sandbox.TestPage1" delay="3" visible="false"/}}
 {{/code}}
 
 == With absolute URL ==
 
 {{code}}
-{{redirect location="https://www.w3.org" delay="2"/}}
+{{redirect reference="https://www.w3.org" delay="2"/}}
 {{/code}}
 
 == With relative URL ==
 
 {{code}}
-{{redirect location="/xwiki/bin/view/Sandbox/#HLinks"/}}
+{{redirect reference="/xwiki/bin/view/Sandbox/#HLinks"/}}
 {{/code}}</content>
   <object>
     <name>XWiki.Macros.Redirect</name>
