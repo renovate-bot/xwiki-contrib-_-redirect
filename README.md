@@ -1,6 +1,6 @@
-# (project title)
+# Redirect macro
 
-(project description).
+Setup a redirect in a document, with a given delay, to a specified location.
 
 * Project Lead: [Paul Pantiru](https://www.xwiki.org/xwiki/bin/view/XWiki/ppantiru)
 * Documentation & Downloads: [Documentation & Download](https://extensions.xwiki.org/xwiki/bin/view/Extension/Redirect)
