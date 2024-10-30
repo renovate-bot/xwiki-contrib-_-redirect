@@ -3,7 +3,7 @@
 Setup a redirect in a document, with a given delay, to a specified location.
 
 * Project Lead: [Paul Pantiru](https://www.xwiki.org/xwiki/bin/view/XWiki/ppantiru)
-* Documentation & Downloads: [Documentation & Download](https://extensions.xwiki.org/xwiki/bin/view/Extension/Redirect)
+* Documentation & Downloads: [Documentation & Download](https://extensions.xwiki.org/xwiki/bin/view/Extension/Redirect%20macro/)
 * [Issue Tracker](https://jira.xwiki.org/browse/REDIRECT)
 * Communication: [Forum](https://forum.xwiki.org/), [Chat](https://dev.xwiki.org/xwiki/bin/view/Community/Chat)
 * [Development Practices](https://dev.xwiki.org)
