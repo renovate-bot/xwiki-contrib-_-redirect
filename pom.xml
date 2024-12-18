@@ -46,7 +46,7 @@
   <scm>
     <connection>scm:git:git://github.com/xwiki-contrib/redirect.git</connection>
     <developerConnection>scm:git:git@github.com:xwiki-contrib/redirect.git</developerConnection>
-    <url>https://github.com/xwiki-contrib/redirect</url>
+    <url>https://github.com/xwiki-contrib/redirect/tree/master</url>
     <tag>HEAD</tag>
   </scm>
   <build>
