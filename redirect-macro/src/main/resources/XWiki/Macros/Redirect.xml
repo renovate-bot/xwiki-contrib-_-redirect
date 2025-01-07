@@ -66,6 +66,128 @@ Parameters:
   <object>
     <name>XWiki.Macros.Redirect</name>
     <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>5646c69a-cb89-4036-b57e-fcacfb070a0f</guid>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <defaultValue>long</defaultValue>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <restricted>0</restricted>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>let redirectMacroDataDivs = document.getElementsByClassName("redirect-macro-data")
+if (redirectMacroDataDivs.length &gt; 0) {
+  let doRedirect = true
+
+  // The following code is executed only when CKEditor is loaded on the current page.
+  require(['deferred!ckeditor'], function (ckeditorPromise) {
+    ckeditorPromise.done(function (ckeditor) {
+      // Wait for an editor instance to be created.
+      ckeditor.once('instanceCreated', function (event) {
+        // cancel redirect if CKEditor is open
+        doRedirect = false
+      });
+    });
+  });
+  let redirectMacroDataDiv = redirectMacroDataDivs[0]
+  let delay = redirectMacroDataDiv.dataset.redirectDelay
+  let target = redirectMacroDataDiv.dataset.redirectLocation
+  setTimeout(() =&gt; {
+    if (doRedirect) {
+      window.location = target
+    }
+  }, delay * 1000)
+}</code>
+    </property>
+    <property>
+      <name/>
+    </property>
+    <property>
+      <parse>0</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.Macros.Redirect</name>
+    <number>0</number>
     <className>XWiki.WikiMacroClass</className>
     <guid>4f8bdc60-a42c-4864-a63b-cab5a36c4292</guid>
     <class>
@@ -280,6 +402,13 @@ Parameters:
     <property>
       <code>{{groovy}}
 import org.xwiki.model.reference.DocumentReferenceResolver
+import org.xwiki.rendering.syntax.Syntax
+import org.xwiki.rendering.syntax.SyntaxType
+import org.xwiki.security.authorization.Right
+import org.xwiki.url.URLSecurityManager
+import org.xwiki.xml.XMLUtils
+
+def logger = services.logging.getLogger("redirect-macro")
 
 // Get the reference parameter
 def reference = wikimacro.parameters.reference
@@ -302,18 +431,57 @@ if (xwiki.exists(documentReference)) {
     location = reference.reference
 }
 
-// Display warning if visible is true
-if (visible) {
-    println """{{warning}}
-    === Redirect Notice ===
-    This page will redirect to **${location}** in about **${delay}** seconds.
-    {{/warning}}"""
+String uri = null
+
+// Check that we are not in spoofing attack case
+services.component.getInstance(URLSecurityManager.class)
+// Note this code was inspired by
+// https://github.com/xwiki/xwiki-platform/blob/8d8ce3b4fc0014ff2e255725e3958f2dc05b0ef7/xwiki-platform-core/xwiki-platform-oldcore/src/main/java/com/xpn/xwiki/web/XWikiServletResponse.java#L56
+try {
+    uri = services.component.getInstance(URLSecurityManager.class).parseToSafeURI(location)
+} catch (URISyntaxException | SecurityException e) {
+    logger.warn(
+        "Possible phishing attack, attempting to redirect to [{}], this request has been blocked. "
+            + "If the request was legitimate, please check the URL security configuration. You "
+            + "might need to add the domain related to this request in the list of trusted domains in "
+            + "the configuration: it can be configured in xwiki.properties in url.trustedDomains.",
+        location)
+    logger.debug("Original error preventing the redirect: ", e)
 }
 
-// Set server-side redirect header if in view mode
-if (xcontext.action == 'view') {
-    def response = xcontext.response
-    response.setHeader("Refresh", "${delay};url=${location}")
+if (uri == null) {
+    if (services.security.authorization.hasAccess(Right.EDIT)) {
+        println """{{error}}
+=== Redirect Error ===
+You are not allowed redirect to **${services.rendering.escape(location, Syntax.XWIKI_2_1)}** for security reason.
+Please contact the administrator to allow the redirection to this website.
+{{/error}}
+
+"""
+    }
+} else {
+    // Display warning if visible is true
+    if (visible) {
+        println """{{warning}}
+=== Redirect Notice ===
+This page will redirect to **${services.rendering.escape(uri, Syntax.XWIKI_2_1)}** in about **${services.rendering.escape(delay.toString(), Syntax.XWIKI_2_1)}** seconds.
+{{/warning}}
+
+"""
+    }
+
+    // Set server-side redirect header if in view mode
+    Syntax syntax = wikimacro.context.transformationContext.targetSyntax
+    SyntaxType targetSyntaxType = syntax == null ? null : syntax.getType()
+    if (xcontext.action == 'view' &amp;&amp; SyntaxType.ANNOTATED_HTML != targetSyntaxType &amp;&amp; SyntaxType.ANNOTATED_XHTML != targetSyntaxType) {
+        def response = xcontext.response
+        if (delay == 0) {
+            response.sendRedirect(uri)
+        } else {
+            xwiki.jsx.use('XWiki.Macros.Redirect')
+            println """{{html clean="false"}}&lt;div class="redirect-macro-data" data-redirect-location="${XMLUtils.escape(uri.toString())}" data-redirect-delay="${XMLUtils.escape(delay.toString())}" hidden=""/&gt;{{/html}}"""
+        }
+    }
 }
 {{/groovy}}</code>
     </property>
